@@ -19,7 +19,7 @@ from discord import ButtonStyle
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 MIDDLEMAN_ROLE_ID = int(
-    os.getenv("MIDDLEMAN_ROLE_ID", "1546891552507564032")
+    os.getenv("MIDDLEMAN_ROLE_ID", "1548878658637144114")
 )
 
 OWNER_ROLE_ID = int(
