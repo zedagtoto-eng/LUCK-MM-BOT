@@ -4,7 +4,7 @@
 
 import os
 import re
-import asynciok
+import asyncio
 import discord
 
 from discord.ext import commands
