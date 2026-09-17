@@ -30,20 +30,21 @@ TICKET_CATEGORY_ID = int(
     os.getenv("TICKET_CATEGORY_ID", "1548605071703547904")
 )
 
+
 # ============================================================
-# BANNERS
+# BANNERS / ICON
 # ============================================================
 
-# Put your image/GIF URL inside the quotes.
-#
-# Example:
-# PANEL_BANNER_URL = "https://i.imgur.com/example.png"
-#
-# Leave "" if you don't want a banner.
+PANEL_BANNER_URL = "https://cdn.discordapp.com/attachments/1548808227674791936/1550291094091206767/Comp_1_27_6.gif?ex=6aadcc97&is=6aac7b17&hm=273315b481fe2551ee7597c7bdd59c99dcb19213d9b07b69c36f307ac189495b&"
 
-PANEL_BANNER_URL = "https://cdn.discordapp.com/attachments/1547444944606593066/1547850627466665995/30D405DD-E3B4-49D5-AAB0-85A3BA6E0106.png?ex=6aa4ebbb&is=6aa39a3b&hm=3a995cad9d28dbb8288423b76e90b8201eeb3ab5116c4bafecd6c166ea336f4d&"
+TICKET_BANNER_URL = "https://cdn.discordapp.com/attachments/1548808227674791936/1550291094091206767/Comp_1_27_6.gif?ex=6aadcc97&is=6aac7b17&hm=273315b481fe2551ee7597c7bdd59c99dcb19213d9b07b69c36f307ac189495b&"
 
-TICKET_BANNER_URL = "https://cdn.discordapp.com/attachments/1547444944606593066/1547850627466665995/30D405DD-E3B4-49D5-AAB0-85A3BA6E0106.png?ex=6aa4ebbb&is=6aa39a3b&hm=3a995cad9d28dbb8288423b76e90b8201eeb3ab5116c4bafecd6c166ea336f4d&"
+# ============================================================
+# PANEL ICON
+# ============================================================
+# Put your icon/logo URL between the quotes.
+
+PANEL_ICON_URL = "https://cdn.discordapp.com/attachments/1548808227674791936/1550291109614198895/Comp_2_16_3.gif?ex=6aadcc9b&is=6aac7b1b&hm=ca9d81033948e2a874b26696d7a6498bd5c7692cff32ccf3f7c6de0156534cef&"
 
 
 if not TOKEN:
@@ -71,18 +72,6 @@ bot = commands.Bot(
 # ============================================================
 # STORAGE
 # ============================================================
-
-# ticket_channel_id:
-#
-# {
-#     "owner": user_id,
-#     "trader": user_id,
-#     "game": "...",
-#     "giving": "...",
-#     "trader_giving": "...",
-#     "private_links": "...",
-#     "claimed_by": None
-# }
 
 tickets = {}
 
@@ -365,13 +354,11 @@ class MiddlemanRequestModal(Modal):
 
         overwrites = {
 
-            # Everyone
             guild.default_role:
                 discord.PermissionOverwrite(
                     view_channel=False
                 ),
 
-            # Ticket creator
             interaction.user:
                 discord.PermissionOverwrite(
                     view_channel=True,
@@ -381,7 +368,6 @@ class MiddlemanRequestModal(Modal):
                     embed_links=True
                 ),
 
-            # Other trader
             trader:
                 discord.PermissionOverwrite(
                     view_channel=True,
@@ -526,9 +512,9 @@ class MiddlemanRequestModal(Modal):
             ),
 
             color=discord.Color.from_rgb(
-                217,
-                232,
-                74
+                255,
+                131,
+                48
             )
         )
 
@@ -557,7 +543,11 @@ class MiddlemanRequestModal(Modal):
 
             title="📋 Trade Details",
 
-            color=discord.Color.from_rgb(217, 232, 74)
+            color=discord.Color.from_rgb(
+                255,
+                131,
+                48
+            )
         )
 
         details.add_field(
@@ -594,7 +584,7 @@ class MiddlemanRequestModal(Modal):
         )
 
         details.set_footer(
-            text="LUCK's MM Service"
+            text="CrossTrade Hub Service"
         )
 
         # ====================================================
@@ -876,10 +866,6 @@ class TicketView(View):
         button: discord.ui.Button
     ):
 
-        # ====================================================
-        # ONLY MIDDLEMAN
-        # ====================================================
-
         if not is_middleman(
             interaction.user
         ):
@@ -890,10 +876,6 @@ class TicketView(View):
             )
 
             return
-
-        # ====================================================
-        # GET TICKET
-        # ====================================================
 
         ticket = tickets.get(
             interaction.channel.id
@@ -907,10 +889,6 @@ class TicketView(View):
             )
 
             return
-
-        # ====================================================
-        # ALREADY CLAIMED
-        # ====================================================
 
         if ticket["claimed_by"]:
 
@@ -933,17 +911,9 @@ class TicketView(View):
 
             return
 
-        # ====================================================
-        # SAVE CLAIM
-        # ====================================================
-
         ticket["claimed_by"] = (
             interaction.user.id
         )
-
-        # ====================================================
-        # REMOVE MM ROLE ACCESS
-        # ====================================================
 
         mm_role = get_middleman_role(
             interaction.guild
@@ -960,10 +930,6 @@ class TicketView(View):
                 read_message_history=False
             )
 
-        # ====================================================
-        # GIVE CLAIMING MM ACCESS
-        # ====================================================
-
         await interaction.channel.set_permissions(
 
             interaction.user,
@@ -975,10 +941,6 @@ class TicketView(View):
             embed_links=True,
             manage_messages=True
         )
-
-        # ====================================================
-        # RESPONSE
-        # ====================================================
 
         await interaction.response.send_message(
             f"✅ {interaction.user.mention} has claimed this ticket!"
@@ -1001,10 +963,6 @@ class TicketView(View):
         button: discord.ui.Button
     ):
 
-        # ====================================================
-        # GET TICKET
-        # ====================================================
-
         ticket = tickets.get(
             interaction.channel.id
         )
@@ -1018,10 +976,6 @@ class TicketView(View):
 
             return
 
-        # ====================================================
-        # ONLY CLAIMING MM
-        # ====================================================
-
         if ticket["claimed_by"] != interaction.user.id:
 
             await interaction.response.send_message(
@@ -1031,18 +985,10 @@ class TicketView(View):
 
             return
 
-        # ====================================================
-        # REMOVE CLAIMED MM OVERRIDE
-        # ====================================================
-
         await interaction.channel.set_permissions(
             interaction.user,
             overwrite=None
         )
-
-        # ====================================================
-        # RESTORE MM ROLE
-        # ====================================================
 
         mm_role = get_middleman_role(
             interaction.guild
@@ -1061,10 +1007,6 @@ class TicketView(View):
                 embed_links=True,
                 manage_messages=True
             )
-
-        # ====================================================
-        # CLEAR CLAIM
-        # ====================================================
 
         ticket["claimed_by"] = None
 
@@ -1102,10 +1044,6 @@ class TicketView(View):
 
             return
 
-        # ====================================================
-        # CLAIMED MM OR OWNER ROLE
-        # ====================================================
-
         allowed = False
 
         if (
@@ -1130,28 +1068,16 @@ class TicketView(View):
 
             return
 
-        # ====================================================
-        # CLOSE MESSAGE
-        # ====================================================
-
         await interaction.response.send_message(
             "🔒 Closing this ticket in 5 seconds..."
         )
 
         await asyncio.sleep(5)
 
-        # ====================================================
-        # REMOVE STORAGE
-        # ====================================================
-
         tickets.pop(
             interaction.channel.id,
             None
         )
-
-        # ====================================================
-        # DELETE CHANNEL
-        # ====================================================
 
         try:
 
@@ -1187,10 +1113,6 @@ class TicketView(View):
         button: discord.ui.Button
     ):
 
-        # ====================================================
-        # ONLY MIDDLEMAN
-        # ====================================================
-
         if not is_middleman(
             interaction.user
         ):
@@ -1201,10 +1123,6 @@ class TicketView(View):
             )
 
             return
-
-        # ====================================================
-        # CHECK CLAIM
-        # ====================================================
 
         ticket = tickets.get(
             interaction.channel.id
@@ -1222,10 +1140,6 @@ class TicketView(View):
                     )
 
                     return
-
-        # ====================================================
-        # OPEN MODAL
-        # ====================================================
 
         await interaction.response.send_modal(
             AddUserModal(
@@ -1250,13 +1164,13 @@ async def ticketpanel(
 
     embed = discord.Embed(
 
-        title="LUCK's MM | MM Service",
+        title="Crosstrade hub | MM Service",
 
         description=(
 
             "Welcome to our middleman Service centre.\n\n"
 
-            "At LUCK's MM, we value and provide a safe "
+            "At Crosstrade hub, we value and provide a safe "
             "and secure way to exchange your goods.\n\n"
 
             "**If you've found a trade and want to ensure "
@@ -1281,9 +1195,9 @@ async def ticketpanel(
         ),
 
         color=discord.Color.from_rgb(
-            217,
-            232,
-            74
+            255,
+            131,
+            48
         )
     )
 
@@ -1297,9 +1211,27 @@ async def ticketpanel(
             url=PANEL_BANNER_URL
         )
 
+    # ========================================================
+    # PANEL ICON / THUMBNAIL
+    # ========================================================
+
+    if PANEL_ICON_URL:
+
+        embed.set_thumbnail(
+            url=PANEL_ICON_URL
+        )
+
+    # ========================================================
+    # FOOTER
+    # ========================================================
+
     embed.set_footer(
-        text="LUCK's MM • Trusted & Secure"
+        text="Crosstrade Hub • Trusted & Secure"
     )
+
+    # ========================================================
+    # SEND PANEL
+    # ========================================================
 
     await ctx.send(
 
