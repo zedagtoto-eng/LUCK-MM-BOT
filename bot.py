@@ -530,7 +530,7 @@ class MiddlemanRequestModal(Modal):
 
         welcome.set_footer(
             text=(
-                "LUCK's MM • "
+                "CrossTrade Hub • "
                 "Please wait for a middleman"
             )
         )
